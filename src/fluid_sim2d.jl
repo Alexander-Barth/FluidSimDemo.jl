@@ -37,7 +37,7 @@ end
     -Δ u + ∇ p = f
     -∇ ⋅ u = 0
 """
-function incompressibility!(config,mask,(u,v),p)
+function incompressibility!(config,mask,p,(u,v))
     Δt,ρ,h = config.Δt,config.ρ,config.h
     sz = size(mask)
 

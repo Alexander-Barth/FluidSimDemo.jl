@@ -78,7 +78,7 @@ end
 
 
 
-function incompressibility!(config,mask::AbstractArray{Bool,N},uv,p) where N
+function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N
     Δt,ρ,h = config.Δt,config.ρ,config.h
     I = CartesianIndices(mask)
     Ifirst, Ilast = first(I), last(I)

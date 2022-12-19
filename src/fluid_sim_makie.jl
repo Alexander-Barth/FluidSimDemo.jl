@@ -1,12 +1,13 @@
 using GLMakie, GeometryBasics
 
 
-const fluidplot_setup = let
-    dragging = Ref(false)
-    click_coord = zeros(2)
-    xy = [0.,0.]
+#const fluidplot_setup = let
 
-    function fluidplot_setup(config,mask,p::AbstractArray{T,N},(u,v)) where {T,N}
+    function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1) where {T,N}
+        dragging = Ref(false)
+        click_coord = zeros(2)
+        xy = [0.,0.]
+
         sz = size(mask)
         cx = config.h * (0:sz[1]-1)
         cy = config.h * (0:sz[2]-1)
@@ -70,6 +71,9 @@ const fluidplot_setup = let
         #readline()
 
         function myplot(mask,p,(u,v),n)
+            if (n % plot_every != 0)
+                return
+            end
             sleep(0.01)
             unstagger_vel((u,v),(u_r,v_r))
             p_ = copy(p)
@@ -97,4 +101,4 @@ const fluidplot_setup = let
 
         return myplot
     end
-end
+#end

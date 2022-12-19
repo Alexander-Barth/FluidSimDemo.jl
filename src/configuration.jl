@@ -109,6 +109,7 @@ function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.
     )
 
     set_mask!(config,mask,xy,(u,v))
+    boundary_conditions!(config,(u,v))
 
     return (config,mask,p,(u,v),(newu,newv))
 end

@@ -1,5 +1,6 @@
 function step(config,mask,p,uv,newuv)
     integrate!(config,mask,uv)
+    boundary_conditions!(config,uv)
     p .= 0
     incompressibility!(config,mask,p,uv)
     boundary_conditions!(config,uv)
@@ -10,6 +11,7 @@ end
 
 function main!(config,mask,p,uv,newuv,nmax; callback = nothing)
     for n = 1:nmax
+        #@show uv[1][1:30,50]
         step(config,mask,p,uv,newuv)
         if !isnothing(callback)
             callback(mask,p,uv,n)

@@ -5,6 +5,8 @@ import FluidSimDemo.Physics2D
 import FluidSimDemo.PhysicsND
 
 
+import FluidSimDemo.PhysicsND: interp
+
 
 config,mask,p,(u,v),(newu,newv) = FluidSimDemo.config_Karman_vortex_street()
 
@@ -17,6 +19,8 @@ F = [1 2; 3 4]
 
 # velocity components (staggered grid)
 
+sz = size(mask)
+T = eltype(p)
 uv = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 @time Physics2D.integrate!(config,mask,uv)
 
@@ -32,14 +36,14 @@ uvn = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 
 
 p = zeros(T,sz)
-@time Physics2D.incompressibility!(config,mask,uv,p)
+@time Physics2D.incompressibility!(config,mask,p,uv)
 
 pn = zeros(T,sz)
-@time PhysicsND.incompressibility!(config,mask,uvn,pn)
+@time PhysicsND.incompressibility!(config,mask,pn,uvn)
 
 @test p ≈ pn
 
-
+newuv = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 
 @time Physics2D.advection!(config,mask,uv,newuv);
 
@@ -49,8 +53,8 @@ newuvn = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 @test uv[1] ≈ uvn[1]
 @test uv[2] ≈ uvn[2]
 
-@btime Physics2D.advection!(config,mask,uv,newuv);
-@btime PhysicsND.advection!(config,mask,uv,newuv);
+@time Physics2D.advection!(config,mask,uv,newuv);
+@time PhysicsND.advection!(config,mask,uv,newuv);
 
 
 
@@ -70,4 +74,4 @@ $ gfortran  -O2 fluid_sim.f90 -o fluid_sim && ./fluid_sim
  p   -466865.094
 
 
-
+=#

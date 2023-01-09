@@ -1,10 +1,7 @@
 module PhysicsND
 
 function interp(F::AbstractArray{T,N},fij) where {T,N}
-    #@show "here"
     fij_ = clamp.(fij,1,size(F))
-    #fij_ = ntuple(i -> clamp(fij[i],1,size(F,i)),Val(N))
-    #fij_ = @inbounds ntuple(i -> fij[i],Val(N))
     ij = min(floor.(Int,fij_),size(F) .- 1)
     a = fij_ .- ij
 
@@ -35,48 +32,6 @@ function integrate!(config,mask::AbstractArray{Bool,N},uv) where N
         end
     end
 end
-
-@generated function integrate3_!(config,mask::AbstractArray{Bool,N},uv) where N
-    quote
-        Δt,g = config.Δt,config.g
-        sz = size(mask)
-
-        @inbounds @nexprs $N j -> begin
-            u = uv[j]
-            @nloops $N i k -> (k == j ? (2:sz[k]) : (1:sz[k])) begin
-                (@nref $N u i) = g[j] * Δt * (@nref $N mask i) * (@nref $N mask l ->
-                    (l == j ? i_l - 1 : i_l))
-            end
-        end
-    end
-end
-
-
-function integrate4impl!(config,mask::Type{T},uv) where T <: AbstractArray{Bool,N} where N
-    return quote
-        Δt,g = config.Δt,config.g
-        sz = size(mask)
-
-        @inbounds @nloops $N i k -> 1:sz[k] begin
-            @nexprs $N j -> begin
-                u = @inbounds uv[j]
-
-                if (i_j > 1)
-                    @inbounds (@nref $N u i) = g[j] * Δt * (@nref $N mask i) * (@nref $N mask l ->
-                        (l == j ? i_l - 1 : i_l))
-                end
-            end
-        end
-    end
-end
-
-
-
-@generated function integrate4_!(config,mask::AbstractArray{Bool,N},uv) where N
-    return integrate4impl!(config,mask,uv)
-end
-
-
 
 function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N
     Δt,ρ,h = config.Δt,config.ρ,config.h
@@ -152,7 +107,7 @@ function advection!(config,mask::AbstractArray{Bool,N},uv::NTuple{N,AbstractArra
              end
         end
     end
-    #@show "ll"
+
     ntuple(Val(N)) do i
         u = uv[i]
         newu = newuv[i]

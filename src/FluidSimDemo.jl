@@ -1,3 +1,8 @@
+"""
+    ∂ₜ u + u ∇u = -∇p/ρ
+          ∇ ⋅ u = 0
+
+"""
 module FluidSimDemo
 
 include("fluid_sim_makie.jl")

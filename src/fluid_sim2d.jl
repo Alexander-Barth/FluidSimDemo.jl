@@ -1,5 +1,20 @@
 module Physics2D
 
+
+#=
+
+    +--------v[i,j+1]--------+
+    |                        |
+    |                        |
+    |         p[i,j]         |
+ u[i,j]      mask[i,j]     u[i+1,j]
+    |          div           |
+    |                        |
+    |                        |
+    +---------v[i,j]---------+
+
+=#
+
 function interp(F,(fi,fj))
     fi = clamp(fi,1,size(F,1))
     fj = clamp(fj,1,size(F,2))
@@ -21,22 +36,18 @@ function integrate!(config,mask,(u,v))
     @inbounds for j = 1:sz[2] # one single loop is marginally faster
         for i = 1:sz[1]
             if (i > 1)
-                u[i,j] += g[1] * Δt * mask[i,j] * mask[i-1,j]
+                #u[i,j] += g[1] * Δt * mask[i,j] * mask[i-1,j]
+                u[i,j] = (u[i,j] + g[1] * Δt) * mask[i,j] * mask[i-1,j]
             end
 
             if (j > 1)
-                v[i,j] += g[2] * Δt * mask[i,j] * mask[i,j-1]
+                #v[i,j] += g[2] * Δt * mask[i,j] * mask[i,j-1]
+                v[i,j] = (v[i,j] + g[2] * Δt) * mask[i,j] * mask[i,j-1]
             end
         end
     end
 end
 
-
-
-"""
-    -Δ u + ∇ p = f
-    -∇ ⋅ u = 0
-"""
 function incompressibility!(config,mask,p,(u,v))
     Δt,ρ,h = config.Δt,config.ρ,config.h
     sz = size(mask)
@@ -104,6 +115,5 @@ function advection!(config,mask,(u,v),(newu,newv))
     u .= newu
     v .= newv
 end
-
 
 end

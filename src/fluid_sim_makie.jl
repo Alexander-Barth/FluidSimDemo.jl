@@ -63,6 +63,7 @@ using GLMakie, GeometryBasics
                     xy .= new_coord .- click_coord .+ xy
                     click_coord .= new_coord
                     set_mask!(config,mask,xy,(u,v))
+                    #@show  "cb",u[1:30,50]
                 end
             end
         end

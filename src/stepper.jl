@@ -9,7 +9,7 @@ function step(config,mask,p,uv,newuv)
 end
 
 
-function main!(config,mask,p,uv,newuv,nmax; callback = nothing)
+function main!(config,mask,p,uv,newuv,nmax::Integer; callback = nothing)
     for n = 1:nmax
         #@show uv[1][1:30,50]
         step(config,mask,p,uv,newuv)
@@ -17,4 +17,16 @@ function main!(config,mask,p,uv,newuv,nmax; callback = nothing)
             callback(mask,p,uv,n)
         end
     end
+end
+
+
+function main!(config,mask,p,uv,nmax::Integer; callback = nothing,
+               newuv = similar.(uv),
+               )
+
+    for u in newuv
+        u .= 0
+    end
+
+    main!(config,mask,p,uv,newuv,nmax; callback = callback)
 end

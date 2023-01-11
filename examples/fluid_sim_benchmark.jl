@@ -3,6 +3,7 @@ using BenchmarkTools
 
 config,mask,p,(u,v),(newu,newv) = FluidSimDemo.config_Karman_vortex_street()
 
+T = eltype(u)
 uv = (u,v)
 newuv = (newu,newv)
 nmax = 1

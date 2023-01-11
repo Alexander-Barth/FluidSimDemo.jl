@@ -4,8 +4,8 @@ This package solves the inviscit, incompressible Navier Stokes equations in 2 or
 # Installation
 
 ```julia
-
-
+using Pkg
+Pkg.add(url="https://github.com/Alexander-Barth/FluidSimDemo.jl")
 ```
 
 
@@ -31,10 +31,10 @@ This equation is solved in different steps:
 1. Apply external forces (in particular gravity)
 
 $$
-\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t  \mathbf g
+\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \; \mathbf g
 $$
 
-Impose on boundaries $\mathbf {u'}^{(n)} = 0$ that
+Impose on boundaries $\mathbf {u'}^{(n)} = 0$.
 
 
 2. Advection of velocity field  $\mathbf {u''}^{(n)}$. The combined force of inertia and external forces acting from $n-1$ to $n$ are written as $\mathbf F$:
@@ -87,32 +87,34 @@ $$
 $$
 
 
-
-
+The pressure is solved iteratively (using Gauss-Seidel with overrelaxation) with a fixed number of iterations. In the following algorithm $\leftarrow$ is the assignement operator.
 Intitialize the iteration:
 
 $$\begin{array}{cc}
-u'''_{i,j} &:= u''^{(n)}_{i,j} \\
-v'''_{i,j} &:= v''^{(n)}_{i,j} \\
-p_{i,j} & := 0
-$$\end{array}
+u'''_{i,j} &\leftarrow u''^{(n)}_{i,j} \\
+v'''_{i,j} &\leftarrow v''^{(n)}_{i,j} \\
+p_{i,j} & \leftarrow 0
+\end{array}
+$$
+
+The time index $n$ is dropped as all parmeters are from the same time instance.
 
 Compute pressure adjustement by:
 
 $$
-\Delta p = -\frac{\rho \Delta x}{4 \Delta t} (u'''_{i+1,j} - u'''_{i,j} + v'''_{i,j+1} - v'''_{i,j})
+\Delta p \leftarrow -\frac{\rho \Delta x}{4 \Delta t} (u'''_{i+1,j} - u'''_{i,j} + v'''_{i,j+1} - v'''_{i,j})
 $$
 
 Adjust the pressure
 
 $$
-p_{i,j} := p_{i,j} + \Delta p
+p_{i,j} \leftarrow p_{i,j} + \Delta p
 $$
 
 Update the velocity accordingly
 
 $$\begin{array}{cc}
-u'''_{i,j} &:= u'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i-1,j}}{\Delta x} \frac{\Delta t}{\rho} \\
-v'''_{i,j} &:= v'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i,j-1}}{\Delta x} \frac{\Delta t}{\rho} \\
+u'''_{i,j} &\leftarrow u'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i-1,j}}{\Delta x} \frac{\Delta t}{\rho} \\
+v'''_{i,j} &\leftarrow v'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i,j-1}}{\Delta x} \frac{\Delta t}{\rho} \\
 \end{array}
 $$

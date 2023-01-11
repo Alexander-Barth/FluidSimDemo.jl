@@ -49,7 +49,7 @@ $$
 $$
 
 
-Divergence of velocity must remain zero:
+3. Divergence of velocity must remain zero:
 
 $$
 \nabla \cdot \left( \mathbf F - \frac{1}{\rho} \nabla p^{(n)}  \right) = 0
@@ -93,7 +93,7 @@ Intitialize the iteration:
 $$\begin{array}{cc}
 u'''_{i,j} &\leftarrow u''^{(n)}_{i,j} \\
 v'''_{i,j} &\leftarrow v''^{(n)}_{i,j} \\
-p_{i,j} & \leftarrow 0
+p_{i,j}    &\leftarrow 0
 \end{array}
 $$
 

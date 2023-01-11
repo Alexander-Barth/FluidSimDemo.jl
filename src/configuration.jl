@@ -53,7 +53,7 @@ function boundary_conditions!(config,(u,v))
     # inflow
     @inbounds for j = 1:size(u,2)
         u[2,j] = config.u0
-        # semi-lagrangian advection might produce values on land
+        # semi-lagrangian advection might query values on land
         u[1,j] = u[2,j]
     end
 
@@ -106,6 +106,7 @@ function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.
         # size of the domain
         sz = sz,
         xy = xy,
+        boundary_conditions! = boundary_conditions!,
     )
 
     set_mask!(config,mask,xy,(u,v))

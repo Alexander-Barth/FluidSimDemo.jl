@@ -8,7 +8,9 @@ import FluidSimDemo.PhysicsND
 import FluidSimDemo.PhysicsND: interp
 
 
-config,mask,p,(u,v),(newu,newv) = FluidSimDemo.config_Karman_vortex_street()
+config,mask,p,uv = FluidSimDemo.config_Karman_vortex_street()
+
+
 
 F = [1 2; 3 4]
 @test interp(F,(1,1)) ≈ 1.
@@ -19,20 +21,20 @@ F = [1 2; 3 4]
 
 # velocity components (staggered grid)
 
+uv[1][10,10] = 1
+
 sz = size(mask)
 T = eltype(p)
-uv = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
+uvn = deepcopy(uv)
 @time Physics2D.integrate!(config,mask,uv)
 
-uvn = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 @time PhysicsND.integrate!(config,mask,uvn)
 
 @test uv[1] ≈ uvn[1]
 @test uv[2] ≈ uvn[2]
 
-
 #@btime Physics2D.integrate!(config,mask,uv)
-#@btime PhysicsND.integrate4!(config,mask,uvn)
+#@btime PhysicsND.integrate!(config,mask,uvn)
 
 
 p = zeros(T,sz)
@@ -53,8 +55,6 @@ newuvn = (zeros(T,sz[1]+1,sz[2]),zeros(T,sz[1],sz[2]+1))
 @test uv[1] ≈ uvn[1]
 @test uv[2] ≈ uvn[2]
 
-@time Physics2D.advection!(config,mask,uv,newuv);
-@time PhysicsND.advection!(config,mask,uv,newuv);
 
 
 

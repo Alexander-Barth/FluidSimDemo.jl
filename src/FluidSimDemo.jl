@@ -10,8 +10,8 @@ include("fluid_simnd.jl")
 include("fluid_sim2d.jl")
 
 
-#using .PhysicsND: interp, integrate!, incompressibility!, advection!
-using .Physics2D: interp, integrate!, incompressibility!, advection!
+using .PhysicsND: interp, integrate!, incompressibility!, advection!
+#using .Physics2D: interp, integrate!, incompressibility!, advection!
 
 include("configuration.jl")
 include("stepper.jl")

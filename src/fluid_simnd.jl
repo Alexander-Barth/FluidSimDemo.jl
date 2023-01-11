@@ -27,7 +27,8 @@ function integrate!(config,mask::AbstractArray{Bool,N},uv) where N
     @inbounds for ij in CartesianIndices(mask)
         ntuple(Val(N)) do i
             @inbounds if ij[i] > 1
-                uv[i][ij] += g[i] * Δt * mask[ij] * mask[ij-unitvecs[i]]
+                #uv[i][ij] += g[i] * Δt * mask[ij] * mask[ij-unitvecs[i]]
+                uv[i][ij] = (uv[i][ij] + g[i] * Δt) * mask[ij] * mask[ij-unitvecs[i]]
             end
         end
     end

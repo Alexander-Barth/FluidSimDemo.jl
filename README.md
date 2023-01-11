@@ -31,7 +31,7 @@ This equation is solved in different steps:
 1. Apply external forces (in particular gravity)
 
 $$
-\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \, \mathbf g
+\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \mathbf g
 $$
 
 Impose on boundaries $\mathbf {u'}^{(n)} = 0$.
@@ -58,7 +58,7 @@ $$
 which leads to:
 
 $$
-\nabla^2 p^{(n)} = \rho \; \nabla \cdot \mathbf {F}^{(n)}
+\nabla^2 p^{(n)} = \rho  \nabla \cdot \mathbf {F}^{(n)}
 $$
 
 Note that it is not necessary to compute $\mathbf F$ separatly as its divergence can be compute from 
@@ -71,7 +71,7 @@ $$
 
 
 $$
-\nabla \cdot \mathbf {u''}^{(n)} = \Delta t \; \nabla \cdot \mathbf F
+\nabla \cdot \mathbf {u''}^{(n)} = \Delta t  \nabla \cdot \mathbf F
 $$
 
 Choose pessure such that:

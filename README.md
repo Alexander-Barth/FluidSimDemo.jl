@@ -31,7 +31,7 @@ This equation is solved in different steps:
 1. Apply external forces (in particular gravity)
 
 $$
-\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \; \mathbf g
+\mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \, \mathbf g
 $$
 
 Impose on boundaries $\mathbf {u'}^{(n)} = 0$.

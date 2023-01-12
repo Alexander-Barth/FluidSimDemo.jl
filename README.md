@@ -9,6 +9,8 @@ https://user-images.githubusercontent.com/9881475/212127012-f02edcfb-7b9c-4c51-9
 
 # Installation
 
+In a julia terminal, run the following commands to install this package:
+
 ```julia
 using Pkg
 Pkg.add(url="https://github.com/Alexander-Barth/FluidSimDemo.jl")
@@ -34,15 +36,15 @@ $$
 $$
 
 
-This equation is solved in different steps:
+These equations are solved in this different steps:
 
-1. Apply external forces (in particular gravity)
+1. Apply external forces $\mathbf g$ (in particular gravity)
 
 $$
 \mathbf {u'}^{(n)} = \mathbf u^{(n-1)} + \Delta t \mathbf g
 $$
 
-Impose on boundaries $\mathbf {u'}^{(n)} = 0$.
+Impose on boundaries $\mathbf {u'}^{(n)} = 0$ or the corresponding inflow/outflow velocity. 
 
 
 2. Advection of velocity field  $\mathbf {u''}^{(n)}$. The combined force of inertia and external forces acting from $n-1$ to $n$ are written as $\mathbf F$:
@@ -52,12 +54,7 @@ $$
 \mathbf {u''}^{(n)} = \mathbf {u}^{(n-1)} + \Delta t \mathbf F
 $$
 
-$$
-\mathbf {u}^{(n)} = \mathbf {u}^{(n-1)} + \Delta t \mathbf F - \frac{\Delta t}{\rho} \nabla p
-$$
-
-
-3. Divergence of velocity must remain zero:
+3. The pressure is computed by requiring that the divergence of velocity must remain zero:
 
 $$
 \nabla \cdot \left( \mathbf F - \frac{1}{\rho} \nabla p^{(n)}  \right) = 0
@@ -95,7 +92,7 @@ $$
 $$
 
 
-The pressure is solved iteratively (using Gauss-Seidel with overrelaxation) with a fixed number of iterations. In the following algorithm $\leftarrow$ is the assignement operator.
+The pressure is solved iteratively (using Gauss-Seidel with overrelaxation) with a fixed number of iterations. In the following algorithm $\leftarrow$ is the assignement operator. For simplicity, the algorithm is outlined for the 2D case:
 Intitialize the iteration:
 
 $$\begin{array}{cc}
@@ -125,4 +122,11 @@ $$\begin{array}{cc}
 u'''_{i,j} &\leftarrow u'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i-1,j}}{\Delta x} \frac{\Delta t}{\rho} \\
 v'''_{i,j} &\leftarrow v'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i,j-1}}{\Delta x} \frac{\Delta t}{\rho} \\
 \end{array}
+$$
+
+After convergence, the velocity $u'''\_{i,j}$ and $v'''\_{i,j}$ correspond to the velocity for the next time step $\mathbf {u}^{(n)}$. On can show 
+that $\mathbf {u}^{(n)}$ and $p$ satisfy the following equations:
+
+$$
+\mathbf {u}^{(n)} = \mathbf {u}^{(n-1)} + \Delta t \mathbf F - \frac{\Delta t}{\rho} \nabla p
 $$

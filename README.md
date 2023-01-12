@@ -8,6 +8,8 @@ using Pkg
 Pkg.add(url="https://github.com/Alexander-Barth/FluidSimDemo.jl")
 ```
 
+Then run the [examples/fluid_sim_demo.jl](examples/fluid_sim_demo.jl).
+
 
 # Mathematical background
 

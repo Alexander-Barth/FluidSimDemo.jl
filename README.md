@@ -1,6 +1,12 @@
 
 This package solves the inviscit, incompressible Navier Stokes equations in 2 or 3 (or any other) dimensions.
 
+
+
+https://user-images.githubusercontent.com/9881475/212127012-f02edcfb-7b9c-4c51-9056-cac4a3718876.mp4
+
+
+
 # Installation
 
 ```julia

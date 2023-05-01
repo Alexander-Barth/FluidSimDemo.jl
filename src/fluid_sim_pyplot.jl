@@ -21,8 +21,8 @@ end
 
 function fluidplot_setup(config,mask,p,(u,v))
     sz = size(mask)
-    cx = config.h * (0:sz[1]-1)
-    cy = config.h * (0:sz[2]-1)
+    cx = config.Δxy[1] * (0:sz[1]-1)
+    cy = config.Δxy[2] * (0:sz[2]-1)
 
     dpi = 96
     fig = figure(figsize=(900/dpi,300/dpi),dpi=dpi)

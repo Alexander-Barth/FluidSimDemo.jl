@@ -7,8 +7,8 @@ function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1) where
     xy = [0.,0.]
 
     sz = size(mask)
-    cx = config.h * (0:sz[1]-1)
-    cy = config.h * (0:sz[2]-1)
+    cx = config.Δxy[1] * (0:sz[1]-1)
+    cy = config.Δxy[2] * (0:sz[2]-1)
 
     u_r = zeros(T,sz)
     v_r = zeros(T,sz)

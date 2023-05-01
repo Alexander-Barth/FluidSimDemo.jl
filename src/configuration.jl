@@ -91,8 +91,7 @@ function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.
     config = (
         # inflow velocity
         u0 = T(2.), # m/s
-        # grid resolution
-        h = T(0.01), # m  replaced by Δx and Δy
+        # grid resolution (x and y directions)
         Δxy =  (T(0.01), T(0.01)), # m
         # time step
         Δt = T(1/60), # s

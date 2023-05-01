@@ -35,13 +35,17 @@ function integrate!(config,mask::AbstractArray{Bool,N},uv) where N
 end
 
 function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N
-    Δt,ρ,h = config.Δt,config.ρ,config.h
+    Δt,ρ = config.Δt,config.ρ
+    Δxy = config.Δxy
+
     I = CartesianIndices(mask)
     Ifirst, Ilast = first(I), last(I)
     I1 = oneunit(Ifirst)
     unitvecs = ntuple(i -> CartesianIndex(ntuple(==(i), Val(N))), Val(N))
 
-    cp = ρ * h / Δt
+    inv_Δxy = 1 ./ Δxy
+    ΔA = prod(Δxy)
+    cp = ρ / Δt
 
     # Gauss-Seidel
     @inbounds for iter = 1:config.iter_pressure
@@ -61,31 +65,34 @@ function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N
             end
 
             div = zero(eltype(uv[1]))
-            for (u,uvec) in zip(uv,unitvecs)
-                div += u[ij + uvec] - u[ij]
+            for (u,uvec,inv_Δx) in zip(uv,unitvecs,inv_Δxy)
+                div += (u[ij + uvec] - u[ij]) * inv_Δx
             end
 
-            p_ = -div/nn
+            p_ = -(div * ΔA)/nn
             p_ *= config.overrelaxation
             # pressure
             p[ij] += cp * p_
 
-            for (u,uvec) in zip(uv,unitvecs)
-                u[ij]      -= p_ *  mask[ij - uvec]
-                u[ij+uvec] += p_ *  mask[ij + uvec]
+            for (u,uvec,inv_Δx) in zip(uv,unitvecs,inv_Δxy)
+                u[ij]      -= p_ *  mask[ij - uvec] * inv_Δx
+                u[ij+uvec] += p_ *  mask[ij + uvec] * inv_Δx
             end
         end
     end
 end
 
 function advection!(config,mask::AbstractArray{Bool,N},uv::NTuple{N,AbstractArray{T,N}},newuv) where {N,T}
-    Δt,h = config.Δt,config.h
+    Δt = config.Δt
+    Δxy = config.Δxy
     sz = size(mask)
 
     unitvecs = ntuple(i -> CartesianIndex(ntuple(==(i), Val(N))), Val(N))
     I = CartesianIndices(mask)
     Ifirst, Ilast = first(I), last(I)
     I1 = oneunit(Ifirst)
+
+    inv_Δxy = 1 ./ Δxy
 
     ntuple(Val(N)) do i
         u = uv[i]
@@ -96,12 +103,12 @@ function advection!(config,mask::AbstractArray{Bool,N},uv::NTuple{N,AbstractArra
              if mask[ij] && mask[ij-unitvecs[i]]
                 fij = ntuple(Val(N)) do j
                     @inbounds if i == j
-                        ij[j] - (u[ij] * Δt/h)
+                        ij[j] - (u[ij] * Δt) * inv_Δxy[j]
                     else
                         v = uv[j]
                         vs = T(0.25) * (v[ij] + v[ij-uvec] +
                             v[ij+unitvecs[j]] + v[ij+unitvecs[j] - uvec])
-                        ij[j] - (vs * Δt)/h
+                        ij[j] - (vs * Δt) * inv_Δxy[j]
                     end
                 end
                  newu[ij] = interp(u,fij)

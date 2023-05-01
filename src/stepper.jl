@@ -1,4 +1,4 @@
-function step(config,mask,p,uv,newuv)
+function step!(config,mask,p,uv,newuv)
     integrate!(config,mask,uv)
     config.boundary_conditions!(config,uv)
     p .= 0
@@ -14,7 +14,7 @@ function main!(config,mask,p,uv,newuv,nmax::Integer;
                )
     for n = 1:nmax
         #@show uv[1][1:30,50]
-        step(config,mask,p,uv,newuv)
+        step!(config,mask,p,uv,newuv)
         if !isnothing(callback)
             callback(mask,p,uv,n)
         end

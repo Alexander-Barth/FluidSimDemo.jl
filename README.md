@@ -107,7 +107,7 @@ The time index $n$ is dropped as all parmeters are from the same time instance.
 Compute pressure adjustement by:
 
 $$
-\Delta p \leftarrow -\frac{\rho \Delta x \Delta y}{4 \Delta t} (\frac{u'''_{i+1,j} - u'''_{i,j}}{\Delta x} + \frac{v'''_{i,j+1} - v'''_{i,j}}{\Delta y})
+\Delta p \leftarrow -\frac{\rho \Delta x \Delta y}{4 \Delta t} \left(\frac{u'''_{i+1,j} - u'''_{i,j}}{\Delta x} + \frac{v'''_{i,j+1} - v'''_{i,j}}{\Delta y} \right)
 $$
 
 Adjust the pressure

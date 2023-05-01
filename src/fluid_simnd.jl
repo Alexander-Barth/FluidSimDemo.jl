@@ -34,6 +34,10 @@ function integrate!(config,mask::AbstractArray{Bool,N},uv) where N
     end
 end
 
+function free_surface!(config,mask,η,uv)
+    @show "todo"
+end
+
 function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N
     Δt,ρ = config.Δt,config.ρ
     Δxy = config.Δxy

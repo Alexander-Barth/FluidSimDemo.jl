@@ -48,7 +48,39 @@ function integrate!(config,mask,(u,v))
     end
 end
 
-function surface_elevatin!(config,mask,p,(u,v))
+function free_surface!(config,mask,η,(u,v))
+    h = config.h[1,1] # depth m
+    g = config.grav
+    Δt = config.Δt
+    Δx, Δy = config.Δxy
+    inv_Δx = 1/Δx
+    inv_Δy = 1/Δy
+
+    imax,jmax = size(η)
+    Δt_over_Δx = Δt/Δx
+    Δt_over_Δy = Δt/Δy
+    g_Δt_over_Δx = g*Δt/Δx
+    g_Δt_over_Δy = g*Δt/Δy
+
+    @inbounds for j = 1:jmax-1
+        for i = 1:imax-1
+            η[i,j] = η[i,j] - (  (h*u[i+1,j] - h*u[i,j]) * Δt_over_Δx
+                               + (h*v[i,j+1] - h*v[i,j]) * Δt_over_Δy)
+        end
+    end
+
+    # single loop is a bit faster
+    @inbounds for j = 1:jmax
+        for i = 1:imax
+            if i > 2
+                u[i,j] = u[i,j] - (η[i,j] - η[i-1,j]) * g_Δt_over_Δx
+            end
+
+            if j > 2
+                v[i,j] = v[i,j] - (η[i,j] - η[i,j-1]) * g_Δt_over_Δy
+            end
+        end
+    end
 end
 
 function incompressibility!(config,mask,p,(u,v))

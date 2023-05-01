@@ -25,11 +25,17 @@ config,mask,p,(u,v) = FluidSimDemo.config_Karman_vortex_street(
 # p is the pressure
 # u,v is the x- and y- velocity
 
-
+sz = config.sz
 T = eltype(config.Δt)
+
+h = ones(T,config.sz)
+h_uv = FluidSimDemo.stagger_r2uv(h)
+
 config = (config..., boundary_conditions! = sw_boundary_conditions!,
           grav = T(9.81),
-          h = ones(T,config.sz))
+          h = h,
+          h_uv = h_uv,
+          )
 
 # create a plotting call-back function
 #myplot = FluidSimDemo.plotting(config,mask,p,(u,v), plot_every = 2)
@@ -57,7 +63,11 @@ mask .= false
 mask[2:end-1,2:end-1] .= true
 
 
-using FluidSimDemo.Physics2D: interp, integrate!, incompressibility!, advection!, free_surface!
+using FluidSimDemo.Physics2D: interp, integrate!, incompressibility!, advection!#, free_surface!
+
+#using FluidSimDemo.Physics2D: free_surface!
+#using FluidSimDemo.PhysicsND: free_surface_nd!
+
 
 
 #@btime free_surface!(config,mask,p,uv)
@@ -65,7 +75,8 @@ using FluidSimDemo.Physics2D: interp, integrate!, incompressibility!, advection!
 function step!(config,mask,p,uv,newuv)
     integrate!(config,mask,uv)
     config.boundary_conditions!(config,uv)
-    free_surface!(config,mask,p,uv)
+    FluidSimDemo.Physics2D.free_surface!(config,mask,p,uv)
+    #FluidSimDemo.PhysicsND.free_surface!(config,mask,p,uv)
     config.boundary_conditions!(config,uv)
     advection!(config,mask,uv,newuv)
     config.boundary_conditions!(config,uv)

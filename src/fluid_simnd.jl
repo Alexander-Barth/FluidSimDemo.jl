@@ -34,8 +34,59 @@ function integrate!(config,mask::AbstractArray{Bool,N},uv) where N
     end
 end
 
-function free_surface!(config,mask,η,uv)
-    @show "todo"
+function free_surface!(config,mask::AbstractArray{Bool,N},η,uv) where N
+    #T = eltype(uv[1])
+    h = config.h # depth m
+    h_uv = config.h_uv # depth m
+    grav = config.grav
+    Δt = config.Δt
+    Δxy = config.Δxy
+    sz = size(mask)
+
+    Δt_over_Δxy = Δt ./ Δxy
+    g_Δt_over_Δxy = grav * Δt ./ Δxy
+
+    unitvecs = ntuple(i -> CartesianIndex(ntuple(==(i), Val(N))), Val(N))
+    I = CartesianIndices(mask)
+    Ifirst, Ilast = first(I), last(I)
+    I1 = oneunit(Ifirst)
+
+    # compute surface elevation based on diverge of the transport
+    @inbounds for ij = Ifirst:Ilast-I1
+        for (u,h_u,Δt_over_Δx,uvec) in zip(uv,h_uv,Δt_over_Δxy,unitvecs)
+            η[ij] -= (h_u[ij + uvec]*u[ij + uvec] - h_u[ij]*u[ij]) * Δt_over_Δx
+        end
+        # same speed
+        # ntuple(Val(N)) do i
+        #     @inbounds begin
+        #         u = uv[i]
+        #         h_u = h_uv[i]
+        #         Δt_over_Δx = Δt_over_Δxy[i]
+        #         uvec = unitvecs[i]
+        #         η[ij] -= (h_u[ij + uvec]*u[ij + uvec] - h_u[ij]*u[ij]) * Δt_over_Δx
+        #     end
+        # end
+
+    end
+
+    # update velocities based on pressure gradient
+    # single loop is a bit faster
+    @inbounds for ij in I
+        #significantly slower
+        # for (i,(u,g_Δt_over_Δx,uvec)) in enumerate(zip(uv,g_Δt_over_Δxy,unitvecs))
+        #     if ij[i] > 2
+        #         u[ij] -= (η[ij] - η[ij - uvec]) * g_Δt_over_Δx
+        #     end
+        # end
+        ntuple(Val(N)) do i
+            @inbounds begin
+                u = uv[i]
+                if ij[i] > 2
+                    u[ij] -= (η[ij] - η[ij - unitvecs[i]]) * g_Δt_over_Δxy[i]
+                end
+            end
+        end
+    end
 end
 
 function incompressibility!(config,mask::AbstractArray{Bool,N},p,uv) where N

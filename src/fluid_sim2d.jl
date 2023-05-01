@@ -49,29 +49,30 @@ function integrate!(config,mask,(u,v))
 end
 
 function free_surface!(config,mask,η,(u,v))
-    h = config.h[1,1] # depth m
-    g = config.grav
+    h = config.h # depth m
+    h_u,h_v = config.h_uv # depth m
+    grav = config.grav
     Δt = config.Δt
     Δx, Δy = config.Δxy
-    inv_Δx = 1/Δx
-    inv_Δy = 1/Δy
+    sz = size(mask)
 
-    imax,jmax = size(η)
     Δt_over_Δx = Δt/Δx
     Δt_over_Δy = Δt/Δy
-    g_Δt_over_Δx = g*Δt/Δx
-    g_Δt_over_Δy = g*Δt/Δy
+    g_Δt_over_Δx = grav*Δt/Δx
+    g_Δt_over_Δy = grav*Δt/Δy
 
-    @inbounds for j = 1:jmax-1
-        for i = 1:imax-1
-            η[i,j] = η[i,j] - (  (h*u[i+1,j] - h*u[i,j]) * Δt_over_Δx
-                               + (h*v[i,j+1] - h*v[i,j]) * Δt_over_Δy)
+    # compute surface elevation based on diverge of the transport
+    @inbounds for j = 1:sz[2]-1
+        for i = 1:sz[1]-1
+            η[i,j] = η[i,j] - (  (h_u[i+1,j]*u[i+1,j] - h_u[i,j]*u[i,j]) * Δt_over_Δx
+                               + (h_v[i,j+1]*v[i,j+1] - h_v[i,j]*v[i,j]) * Δt_over_Δy)
         end
     end
 
+    # update velocities based on pressure gradient
     # single loop is a bit faster
-    @inbounds for j = 1:jmax
-        for i = 1:imax
+    @inbounds for j = 1:sz[2]
+        for i = 1:sz[1]
             if i > 2
                 u[i,j] = u[i,j] - (η[i,j] - η[i-1,j]) * g_Δt_over_Δx
             end

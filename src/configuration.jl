@@ -73,7 +73,15 @@ end
 # T type of variables
 # xy initial position of obstace
 
-function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.5])
+function config_Karman_vortex_street(;
+                                     sz = (300,100),
+                                     T = Float32,
+                                     xy = [0.4,0.5],
+                                     Δx = 0.01,
+                                     Δy = Δx,
+                                     Δt = 1/60,
+                                     u0 = 2.
+                                     )
     # velocity components (staggered grid)
     u = zeros(T,sz[1]+1,sz[2])
     v = zeros(T,sz[1],sz[2]+1)
@@ -90,11 +98,11 @@ function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.
 
     config = (
         # inflow velocity
-        u0 = T(2.), # m/s
+        u0 = T(u0), # m/s
         # grid resolution (x and y directions)
-        Δxy =  (T(0.01), T(0.01)), # m
+        Δxy =  (T(Δx), T(Δy)), # m
         # time step
-        Δt = T(1/60), # s
+        Δt = T(Δt), # s
         # acceleration due to gravity
         g = (T(0.),T(0.)), # m/s²
         # density

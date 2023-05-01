@@ -7,13 +7,13 @@ Velocities on masked locations (land) are set to zero.
 """
 function set_mask!(config,mask,xy,(u,v); radius = 0.15)
     sz = size(mask)
-    h = config.h
+    Δxy = config.Δxy
 
     mask .= true
     @inbounds for j = 2:sz[2]-1
         for i = 2:sz[1]-1
-            dx = (i-1 + 0.5) * h - xy[1]
-            dy = (j-1 + 0.5) * h - xy[2]
+            dx = (i-1 + 0.5) * Δxy[1] - xy[1]
+            dy = (j-1 + 0.5) * Δxy[2] - xy[2]
 
             if dx^2 + dy^2 < radius^2
                 mask[i,j] = false
@@ -92,7 +92,8 @@ function config_Karman_vortex_street(; sz = (300,100), T = Float32, xy = [0.4,0.
         # inflow velocity
         u0 = T(2.), # m/s
         # grid resolution
-        h = T(0.01), # m
+        h = T(0.01), # m  replaced by Δx and Δy
+        Δxy =  (T(0.01), T(0.01)), # m
         # time step
         Δt = T(1/60), # s
         # acceleration due to gravity

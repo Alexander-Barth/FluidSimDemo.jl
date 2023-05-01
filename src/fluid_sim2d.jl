@@ -48,11 +48,18 @@ function integrate!(config,mask,(u,v))
     end
 end
 
+function surface_elevatin!(config,mask,p,(u,v))
+end
+
 function incompressibility!(config,mask,p,(u,v))
-    Δt,ρ,h = config.Δt,config.ρ,config.h
+    Δt,ρ = config.Δt,config.ρ
+    Δx, Δy = config.Δxy
     sz = size(mask)
 
-    cp = ρ * h / Δt
+    inv_Δx = 1/Δx
+    inv_Δy = 1/Δy
+    Δxy = Δx * Δy
+    cp = ρ / Δt
 
     # Gauss-Seidel
     @inbounds for iter = 1:config.iter_pressure
@@ -70,16 +77,16 @@ function incompressibility!(config,mask,p,(u,v))
                     continue
                 end
 
-                div = (u[i+1,j] - u[i,j] + v[i,j+1] - v[i,j])
-                p_ = -div/nn
+                div = inv_Δx * (u[i+1,j] - u[i,j]) + inv_Δy * (v[i,j+1] - v[i,j])
+                p_ = -(div * Δxy)/nn
                 p_ *= config.overrelaxation
                 # pressure
                 p[i,j] += cp * p_
 
-                u[i,j]   -= p_ * mask[i-1,j]
-                u[i+1,j] += p_ * mask[i+1,j]
-                v[i,j]   -= p_ * mask[i,j-1]
-                v[i,j+1] += p_ * mask[i,j+1]
+                u[i,j]   -= p_ * mask[i-1,j] * inv_Δx
+                u[i+1,j] += p_ * mask[i+1,j] * inv_Δx
+                v[i,j]   -= p_ * mask[i,j-1] * inv_Δy
+                v[i,j+1] += p_ * mask[i,j+1] * inv_Δy
             end
         end
     end
@@ -87,15 +94,18 @@ end
 
 function advection!(config,mask,(u,v),(newu,newv))
     T = eltype(u)
-    Δt,h = config.Δt,config.h
+    Δt = config.Δt
+    Δx, Δy = config.Δxy
     sz = size(mask)
+    inv_Δx = 1/Δx
+    inv_Δy = 1/Δy
 
     @inbounds for j = 2:sz[2]-1
         for i = 2:sz[1]
             if mask[i,j] && mask[i-1,j]
                 v_u = T(0.25) * (v[i,j] + v[i,j+1] + v[i-1,j] + v[i-1,j+1])
-                fi = i + (-u[i,j] * Δt)/h
-                fj = j + (-v_u * Δt)/h
+                fi = i + (-u[i,j] * Δt) * inv_Δx
+                fj = j + (-v_u * Δt) * inv_Δy
                 newu[i,j] = interp(u,(fi,fj))
             end
         end
@@ -105,8 +115,8 @@ function advection!(config,mask,(u,v),(newu,newv))
         for i = 2:sz[1]-1
             if mask[i,j] && mask[i,j-1]
                 u_v = T(0.25) * (u[i,j] + u[i+1,j] + u[i,j-1] + u[i+1,j-1])
-                fi = i + (-u_v * Δt)/h
-                fj = j + (-v[i,j] * Δt)/h
+                fi = i + (-u_v * Δt) * inv_Δx
+                fj = j + (-v[i,j] * Δt) * inv_Δy
                 newv[i,j] = interp(v,(fi,fj))
             end
         end

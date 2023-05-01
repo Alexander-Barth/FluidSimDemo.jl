@@ -58,7 +58,7 @@ function incompressibility!(config,mask,p,(u,v))
 
     inv_Δx = 1/Δx
     inv_Δy = 1/Δy
-    Δxy = Δx * Δy
+    ΔA = Δx * Δy
     cp = ρ / Δt
 
     # Gauss-Seidel
@@ -78,7 +78,7 @@ function incompressibility!(config,mask,p,(u,v))
                 end
 
                 div = inv_Δx * (u[i+1,j] - u[i,j]) + inv_Δy * (v[i,j+1] - v[i,j])
-                p_ = -(div * Δxy)/nn
+                p_ = -(div * ΔA)/nn
                 p_ *= config.overrelaxation
                 # pressure
                 p[i,j] += cp * p_

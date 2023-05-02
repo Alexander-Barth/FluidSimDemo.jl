@@ -34,10 +34,9 @@ end
 
 function integrate!(config,mask,(u,v))
     Δt,g = config.Δt,config.g
-    sz = size(mask)
 
-    @inbounds for j = 1:sz[2] # one single loop is marginally faster
-        for i = 1:sz[1]
+    @inbounds for j = 1:size(mask,2) # one single loop is marginally faster
+        for i = 1:size(mask,1)
             if (i > 1)
                 #u[i,j] += g[1] * Δt * mask[i,j] * mask[i-1,j]
                 u[i,j] = (u[i,j] + g[1] * Δt) * mask[i,j] * mask[i-1,j]
@@ -58,14 +57,13 @@ function free_surface!(config,n,mask,η,(u,v))
     f = config.f
     Δt = config.Δt
     Δx, Δy = config.Δxy
-    sz = size(mask)
 
     Δt_over_Δx = Δt/Δx
     Δt_over_Δy = Δt/Δy
 
     # compute surface elevation based on divergence of the transport
-    @inbounds for j = 1:sz[2]-1
-        for i = 1:sz[1]-1
+    @inbounds for j = 1:size(mask,2)-1
+        for i = 1:size(mask,1)-1
             η[i,j] = η[i,j] - (  (h_u[i+1,j]*u[i+1,j] - h_u[i,j]*u[i,j]) * Δt_over_Δx
                                + (h_v[i,j+1]*v[i,j+1] - h_v[i,j]*v[i,j]) * Δt_over_Δy)
         end
@@ -95,7 +93,6 @@ end
 function incompressibility!(config,mask,p,(u,v))
     Δt,ρ = config.Δt,config.ρ
     Δx, Δy = config.Δxy
-    sz = size(mask)
 
     inv_Δx = 1/Δx
     inv_Δy = 1/Δy
@@ -104,8 +101,8 @@ function incompressibility!(config,mask,p,(u,v))
 
     # Gauss-Seidel
     @inbounds for iter = 1:config.iter_pressure
-        for j = 2:sz[2]-1
-            for i = 2:sz[1]-1
+        for j = 2:size(mask,2)-1
+            for i = 2:size(mask,1)-1
 
                 #if !mask[i,j] # necessary for WASM which lacks booleans
                 if mask[i,j] == 0

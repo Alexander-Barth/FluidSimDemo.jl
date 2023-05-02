@@ -47,7 +47,7 @@ u[i,j]      mask[i,j]     u[i+1,j]
 =#
 
 
-function boundary_conditions!(config,(u,v))
+function boundary_conditions!(config,mask,(u,v))
     sz = (size(u,1)-1,size(u,2))
 
     # inflow
@@ -118,8 +118,47 @@ function config_Karman_vortex_street(;
     )
 
     set_mask!(config,mask,xy,(u,v))
-    boundary_conditions!(config,(u,v))
+    boundary_conditions!(config,mask,(u,v))
 
     return (config,mask,p,(u,v),(newu,newv))
 end
 
+
+
+
+function sw_boundary_conditions!(config,mask,(u,v))
+    sz = (size(u,1)-1,size(u,2))
+    @inbounds for j = 1:sz[2] # one single loop is marginally faster
+        for i = 1:sz[1]
+            if (i > 1)
+                u[i,j] = u[i,j] * mask[i,j] * mask[i-1,j]
+            end
+
+            if (j > 1)
+                v[i,j] = v[i,j] * mask[i,j] * mask[i,j-1]
+            end
+        end
+    end
+end
+
+function sw_initial_conditions!(config,mask,p,(u,v))
+    Δx,Δy = config.Δxy
+    L = (10 * Δx,10 * Δy)
+
+    mx = (size(mask,1)-1) * Δx / 2
+    my = (size(mask,2)-1) * Δy / 2
+
+    @inbounds for j in 1:size(p,2)
+        for i in 1:size(p,1)
+            x = (i-1) * Δx
+            y = (j-1) * Δy
+            p[i,j] = exp(-(x - mx)^2/L[1]^2 - ((y - my)^2/L[2]^2))
+        end
+    end
+
+    u .= 0
+    v .= 0
+
+    mask .= false
+    @inbounds mask[2:end-1,2:end-1] .= true
+end

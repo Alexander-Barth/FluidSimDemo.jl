@@ -19,8 +19,11 @@ function interp(F,(fi,fj))
     fi = clamp(fi,1,size(F,1))
     fj = clamp(fj,1,size(F,2))
 
-    i = min(floor(Int,fi),size(F,1)-1)
-    j = min(floor(Int,fj),size(F,2)-1)
+    i = min(unsafe_trunc(Int,fi),size(F,1)-1)
+    j = min(unsafe_trunc(Int,fj),size(F,2)-1)
+    # unsuitable for WASM
+    #i = min(floor(Int,fi),size(F,1)-1)
+    #j = min(floor(Int,fj),size(F,2)-1)
 
     a = fi - i
     b = fj - j
@@ -61,7 +64,7 @@ function free_surface!(config,mask,η,(u,v))
     g_Δt_over_Δx = grav*Δt/Δx
     g_Δt_over_Δy = grav*Δt/Δy
 
-    # compute surface elevation based on diverge of the transport
+    # compute surface elevation based on divergence of the transport
     @inbounds for j = 1:sz[2]-1
         for i = 1:sz[1]-1
             η[i,j] = η[i,j] - (  (h_u[i+1,j]*u[i+1,j] - h_u[i,j]*u[i,j]) * Δt_over_Δx
@@ -99,7 +102,8 @@ function incompressibility!(config,mask,p,(u,v))
         for j = 2:sz[2]-1
             for i = 2:sz[1]-1
 
-                if !mask[i,j]
+                #if !mask[i,j] # necessary for WASM which lacks booleans
+                if mask[i,j] == 0
                     continue
                 end
 
@@ -129,13 +133,12 @@ function advection!(config,mask,(u,v),(newu,newv))
     T = eltype(u)
     Δt = config.Δt
     Δx, Δy = config.Δxy
-    sz = size(mask)
     inv_Δx = 1/Δx
     inv_Δy = 1/Δy
 
-    @inbounds for j = 2:sz[2]-1
-        for i = 2:sz[1]
-            if mask[i,j] && mask[i-1,j]
+    @inbounds for j = 2:size(mask,2)-1
+        for i = 2:size(mask,1)
+            if (mask[i,j] == 1) && (mask[i-1,j] == 1)
                 v_u = T(0.25) * (v[i,j] + v[i,j+1] + v[i-1,j] + v[i-1,j+1])
                 fi = i + (-u[i,j] * Δt) * inv_Δx
                 fj = j + (-v_u * Δt) * inv_Δy
@@ -144,9 +147,9 @@ function advection!(config,mask,(u,v),(newu,newv))
         end
     end
 
-    @inbounds for j = 2:sz[2]
-        for i = 2:sz[1]-1
-            if mask[i,j] && mask[i,j-1]
+    @inbounds for j = 2:size(mask,2)
+        for i = 2:size(mask,1)-1
+            if (mask[i,j] == 1) && (mask[i,j-1] == 1)
                 u_v = T(0.25) * (u[i,j] + u[i+1,j] + u[i,j-1] + u[i+1,j-1])
                 fi = i + (-u_v * Δt) * inv_Δx
                 fj = j + (-v[i,j] * Δt) * inv_Δy
@@ -155,8 +158,12 @@ function advection!(config,mask,(u,v),(newu,newv))
         end
     end
 
-    u .= newu
-    v .= newv
+    @inbounds for ij = eachindex(u)
+        u[ij] = newu[ij]
+    end
+    @inbounds for ij = eachindex(v)
+        v[ij] = newv[ij]
+    end
 end
 
 end

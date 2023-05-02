@@ -1,11 +1,11 @@
 function step!(config,mask,p,uv,newuv)
     integrate!(config,mask,uv)
-    config.boundary_conditions!(config,uv)
+    config.boundary_conditions!(config,mask,uv)
     p .= 0
     incompressibility!(config,mask,p,uv)
-    config.boundary_conditions!(config,uv)
+    config.boundary_conditions!(config,mask,uv)
     advection!(config,mask,uv,newuv)
-    config.boundary_conditions!(config,uv)
+    config.boundary_conditions!(config,mask,uv)
 end
 
 

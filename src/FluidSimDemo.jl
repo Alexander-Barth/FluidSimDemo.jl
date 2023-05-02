@@ -5,7 +5,7 @@
 """
 module FluidSimDemo
 
-include("fluid_sim_makie.jl")
+#include("fluid_sim_makie.jl")
 include("fluid_simnd.jl")
 include("fluid_sim2d.jl")
 

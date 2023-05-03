@@ -21,7 +21,7 @@ Then run the [examples/fluid_sim_demo.jl](examples/fluid_sim_demo.jl).
 
 # Mathematical background
 
-## Navier-Stokes equation
+## Navier-Stokes equations
 
 The evolution equation of the velocity $\mathbf u$ is given by:
 
@@ -148,6 +148,10 @@ $$
 
 where h(x,y) is the depth of the water column, f is the Coriolis parameter and g is the acceleration due to gravity. 
 Currently in the continuity equation (first equation), η (often in the order of 100 m) is neglected in front of η (order of cm).
+
+# Implementation
+
+The julia code is implemented using a subset of julia that can be compiled to WebAssembly.
 
 # Credits
 

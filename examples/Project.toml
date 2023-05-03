@@ -1,0 +1,4 @@
+[deps]
+FluidSimDemo = "413075f5-a476-4ea7-bb3e-c053e85577fa"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"

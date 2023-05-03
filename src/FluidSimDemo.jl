@@ -1,11 +1,13 @@
 """
+Model based on on the Navier-Stokes equations:
+
     ∂ₜ u + u ∇u = -∇p/ρ
           ∇ ⋅ u = 0
 
+The density ρ is assumed constant.
 """
 module FluidSimDemo
 
-include("fluid_sim_makie.jl")
 include("fluid_simnd.jl")
 include("fluid_sim2d.jl")
 

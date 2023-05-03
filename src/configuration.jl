@@ -10,6 +10,7 @@ function set_mask!(config,mask,xy,(u,v); radius = 0.15)
     Δxy = config.Δxy
 
     mask .= true
+
     @inbounds for j = 2:sz[2]-1
         for i = 2:sz[1]-1
             dx = (i-1 + 0.5) * Δxy[1] - xy[1]
@@ -25,8 +26,9 @@ function set_mask!(config,mask,xy,(u,v); radius = 0.15)
         end
     end
 
-    mask[1,:] .= false
-    mask[:,[1,end]] .= false
+    @inbounds mask[1,:] .= false
+    @inbounds mask[:,1] .= false
+    @inbounds mask[:,end] .= false
 end
 
 
@@ -49,6 +51,18 @@ u[i,j]      mask[i,j]     u[i+1,j]
 
 function boundary_conditions!(config,mask,(u,v))
     sz = (size(u,1)-1,size(u,2))
+
+    # mask can change
+    @inbounds for j = 1:size(mask,2)
+        for i = 2:size(mask,1)
+            if mask[i,j] == 0
+                u[i,j] = 0
+                u[i+1,j] = 0
+                v[i,j] = 0
+                v[i,j+1] = 0
+            end
+        end
+    end
 
     # inflow
     @inbounds for j = 1:size(u,2)

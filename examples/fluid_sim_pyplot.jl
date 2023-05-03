@@ -1,4 +1,5 @@
 using PyPlot
+using FluidSimDemo: unstagger_vel, set_mask!
 
 function button_press_event(event)
     dragging[] = true

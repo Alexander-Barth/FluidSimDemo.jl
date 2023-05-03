@@ -1,7 +1,7 @@
 using GLMakie, GeometryBasics
+using FluidSimDemo: unstagger_vel, set_mask!
 
-
-function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1) where {T,N}
+function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1, scale = 0.01) where {T,N}
     dragging = Ref(false)
     click_coord = zeros(2)
     xy = [0.,0.]
@@ -31,8 +31,6 @@ function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1) where
     f = heatmap!(ax,cx,cy,pressure)
     ri = 1:5:size(u_r,1)
     rj = 1:5:size(u_r,2)
-
-    scale = 0.01
 
     a_x = Observable([cx[i] for i in ri, j in rj][:])
     a_y = Observable([cy[j] for i in ri, j in rj][:])
@@ -88,7 +86,6 @@ function plotting(config,mask,p::AbstractArray{T,N},(u,v); plot_every = 1) where
         ri = 1:5:size(u_r,1)
         rj = 1:5:size(u_r,2)
 
-        scale = 0.01
         a_x[] = [cx[i] for i in ri, j in rj][:]
         a_y[] = [cy[j] for i in ri, j in rj][:]
         a_u[] = [scale*u_r[i,j] for i in ri, j in rj][:]

@@ -21,6 +21,8 @@ Then run the [examples/fluid_sim_demo.jl](examples/fluid_sim_demo.jl).
 
 # Mathematical background
 
+## Navier-Stokes equation
+
 The evolution equation of the velocity $\mathbf u$ is given by:
 
 $$

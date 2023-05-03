@@ -95,11 +95,12 @@ $$
 The pressure is solved iteratively (using Gauss-Seidel with overrelaxation) with a fixed number of iterations. In the following algorithm $\leftarrow$ is the assignement operator. For simplicity, the algorithm is outlined for the 2D case:
 Intitialize the iteration:
 
-$$\begin{array}{cc}
-u'''_{i,j} &\leftarrow u''^{(n)}_{i,j} \\
-v'''_{i,j} &\leftarrow v''^{(n)}_{i,j} \\
-p_{i,j}    &\leftarrow 0
-\end{array}
+$$
+\begin{alignat*}{2}
+& u'''\_{i,j} &&\leftarrow u''^{(n)}\_{i,j} \\
+& v'''\_{i,j} &&\leftarrow v''^{(n)}\_{i,j} \\
+& p\_{i,j}    &&\leftarrow 0 \\
+\end{alignat*}
 $$
 
 The time index $n$ is dropped as all parmeters are from the same time instance.
@@ -107,7 +108,7 @@ The time index $n$ is dropped as all parmeters are from the same time instance.
 Compute pressure adjustement by:
 
 $$
-\Delta p \leftarrow -\frac{\rho \Delta x \Delta y}{4 \Delta t} \left(\frac{u'''_{i+1,j} - u'''_{i,j}}{\Delta x} + \frac{v'''_{i,j+1} - v'''_{i,j}}{\Delta y} \right)
+\Delta p \leftarrow -\frac{\rho \Delta x \Delta y}{4 \Delta t} \left(\frac{u'''\_{i+1,j} - u'''\_{i,j}}{\Delta x} + \frac{v'''\_{i,j+1} - v'''\_{i,j}}{\Delta y} \right)
 $$
 
 Adjust the pressure
@@ -119,8 +120,8 @@ $$
 Update the velocity accordingly
 
 $$\begin{array}{cc}
-u'''_{i,j} &\leftarrow u'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i-1,j}}{\Delta x} \frac{\Delta t}{\rho} \\
-v'''_{i,j} &\leftarrow v'''_{i,j} - \frac{\Delta p_{i,j} - \Delta p_{i,j-1}}{\Delta y} \frac{\Delta t}{\rho} \\
+u'''\_{i,j} &\leftarrow u'''\_{i,j} - \frac{\Delta p\_{i,j} - \Delta p\_{i-1,j}}{\Delta x} \frac{\Delta t}{\rho} \\
+v'''\_{i,j} &\leftarrow v'''\_{i,j} - \frac{\Delta p\_{i,j} - \Delta p\_{i,j-1}}{\Delta y} \frac{\Delta t}{\rho} \\
 \end{array}
 $$
 

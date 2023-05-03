@@ -131,3 +131,9 @@ that $\mathbf {u}^{(n)}$ and $p$ satisfy the following equations:
 $$
 \mathbf {u}^{(n)} = \mathbf {u}^{(n-1)} + \Delta t \mathbf F - \frac{\Delta t}{\rho} \nabla p
 $$
+
+
+# Credits
+
+The 2D Navier Stokes is based on the [compact implementation](https://github.com/matthias-research/pages/blob/master/tenMinutePhysics/17-fluidSim.html)
+ of Matthias Müller (which has been reimplemented in julia and extended in N-dimensions).

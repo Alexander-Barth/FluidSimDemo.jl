@@ -1,10 +1,12 @@
 """
 Model based on on the Navier-Stokes equations:
 
-    ∂ₜ u + u ∇u = -∇p/ρ
+    ∂ₜ u + u ∇u = -∇p/ρ + g
           ∇ ⋅ u = 0
 
-The density ρ is assumed constant.
+where u is the n-dimensional velocity (typically 2 or 3), ρ density,
+g the accerlation vector due to gravity, p the pressure and ∇ is the nabla
+operator. The density ρ is assumed constant.
 """
 module FluidSimDemo
 

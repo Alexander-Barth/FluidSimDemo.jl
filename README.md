@@ -132,6 +132,20 @@ $$
 \mathbf {u}^{(n)} = \mathbf {u}^{(n-1)} + \Delta t \mathbf F - \frac{\Delta t}{\rho} \nabla p
 $$
 
+## Shallow-water model
+
+The inviscid 2D shallow-water equations (derived from the Navier-Stokes equations) allow to compute the surface elevation η, and the u and v velocity components:
+
+$$
+\begin{align}
+\frac{\partial η}{\partial t} &+ \frac{\partial}{\partial x} \Bigl( (h + η) u \Bigr) + \frac{\partial}{\partial y} \Bigl( (h+η) v \Bigr) = 0,\\
+\frac{\partial u}{\partial t} &+ u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y} - f v = -g \frac{\partial η}{\partial x}\\
+\frac{\partial v}{\partial t} &+ u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y} + f u = -g \frac{\partial η}{\partial y}
+\end{align}
+$$
+
+where h(x,y) is the depth of the water column, f is the Coriolis parameter and g is the acceleration due to gravity. 
+Currently in the continuity equation (first equation), η (often in the order of 100 m) is neglected in front of η (order of cm).
 
 # Credits
 

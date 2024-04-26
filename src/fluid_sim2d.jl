@@ -53,8 +53,8 @@ end
 function free_surface!(config,n,mask,η,(u,v))
     h = config.h # depth m
     h_u,h_v = config.h_uv # depth m
-    g = grav = config.grav
-    f = config.f
+    g = config.grav
+    fCoriolis = config.fCoriolis
     Δt = config.Δt
     Δx, Δy = config.Δxy
 
@@ -70,20 +70,21 @@ function free_surface!(config,n,mask,η,(u,v))
     end
 
     # update velocities based on pressure gradient
-    # single loop is a bit faster
     @inbounds for s = 0:1
         if mod(n+s,2) == 0
             for j = 1:size(mask,2)
                 for i = 2:size(mask,1)
-                    vp = (v[i,j]+v[i,j+1]+v[i-1,j]+v[i-1,j+1])/4;
-                    u[i,j] = u[i,j] + (f*vp - g * (η[i,j] - η[i-1,j])/Δx)*Δt
+                    ff = (fCoriolis[i,j] + fCoriolis[i-1,j])/2
+                    vp = (v[i,j]+v[i,j+1]+v[i-1,j]+v[i-1,j+1])/4
+                    u[i,j] = u[i,j] + (ff*vp - g * (η[i,j] - η[i-1,j])/Δx)*Δt
                 end
             end
         else
             for j = 2:size(mask,2)
                 for i = 1:size(mask,1)
-                    up = (u[i,j]+u[i+1,j]+u[i,j-1]+u[i+1,j-1])/4;
-                    v[i,j] = v[i,j] + (-f*up - g * (η[i,j] - η[i,j-1])/Δy)*Δt
+                    ff = (fCoriolis[i,j] + fCoriolis[i,j-1])/2
+                    up = (u[i,j]+u[i+1,j]+u[i,j-1]+u[i+1,j-1])/4
+                    v[i,j] = v[i,j] + (-ff*up - g * (η[i,j] - η[i,j-1])/Δy)*Δt
                 end
             end
         end
